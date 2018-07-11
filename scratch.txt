@@ -1,0 +1,101 @@
+*** This is an example of what the Cars.com Team uses for their live project ***
+
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+
+
+import com.cars.dr.model.DealerReview;
+import com.cars.dr.model.request.DealerReviewsRequest;
+import com.cars.dr.service.DealerReviewService;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.ParseException;
+import org.json.simple.parser.JSONParser;
+
+public class LambdaHandler implements RequestStreamHandler {
+
+    JSONParser parser = new JSONParser();
+
+    @Override
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+
+        LambdaLogger logger = context.getLogger();
+        logger.log("get-dealer-reviews-lambda function was invoked");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        JSONObject responseJson = new JSONObject();
+        String responseCode = "200";
+        DealerReviewsRequest reviewsRequest = new DealerReviewsRequest();
+        List<DealerReview> dealerReviewsResponse = new ArrayList<>();
+
+        try {
+            JSONObject event = (JSONObject)parser.parse(reader);
+            if (event.get("queryStringParameters") != null) {
+                JSONObject qsp = (JSONObject)event.get("queryStringParameters");
+                if ( qsp.get("dealerPtyId") != null) {
+                    reviewsRequest.setDealerPtyId((String)qsp.get("dealerPtyId"));
+                }
+
+                if ( qsp.get("sortKey") != null) {
+                    reviewsRequest.setSortKey((String)qsp.get("sortKey"));
+                }
+
+                if ( qsp.get("pageNumber") != null) {
+                    reviewsRequest.setPageNumber((Integer) qsp.get("pageNumber"));
+                }
+
+                if ( qsp.get("itemsPerPage") != null) {
+                    reviewsRequest.setItemsPerPage((Integer) qsp.get("itemsPerPage"));
+                }
+
+            }
+
+            JSONObject responseBody = new JSONObject();
+
+            if (reviewsRequest.getDealerPtyId() == null){
+                System.out.println("Hello, you've reached the get-dealer-reviews-lambda function");
+                responseBody.put("response", "Hello, you've reached the get-dealer-reviews-lambda function");
+            } else {
+                System.out.println("Provided with input : " + reviewsRequest.toString());
+                DealerReviewService dealerReviewService = new DealerReviewService();
+                dealerReviewsResponse = dealerReviewService.getDealerReviews(reviewsRequest.getDealerPtyId(), reviewsRequest.getSortKey(), reviewsRequest.getReviewType(), reviewsRequest.getPageNumber(), reviewsRequest.getItemsPerPage());
+                responseBody.put("response", dealerReviewsResponse);
+            }
+
+
+            responseBody.put("input", event.toJSONString());
+
+
+            JSONObject headerJson = new JSONObject();
+            headerJson.put("x-custom-header", "my custom header value");
+
+            responseJson.put("isBase64Encoded", false);
+            responseJson.put("statusCode", responseCode);
+            responseJson.put("headers", headerJson);
+            responseJson.put("body", responseBody.toString());
+
+        }catch (ParseException pex){
+            responseJson.put("statusCode", "400");
+            responseJson.put("exception", pex);
+        }
+
+
+        logger.log(responseJson.toJSONString());
+        OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
+        writer.write(responseJson.toJSONString());
+        writer.close();
+
+    }
+}

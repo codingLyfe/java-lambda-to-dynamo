@@ -1,0 +1,88 @@
+// this code works for inputStream.json file (may need to replace input.json contents to run this)
+
+//try {
+//	JSONObject event = (JSONObject)parser.parse(reader);
+//	System.out.println(event);
+//	
+//	// try to get values out of JSON input stream
+//	if (event.get("name") != null) {
+//		System.out.println("Name of Event: " + event.get("name"));
+//	}
+//	if (event.get("details") != null) {
+//		System.out.println("Details: " + event.get("details").toString());
+//		
+//		//converting details to JSONObject
+//		JSONObject details = (JSONObject) event.get("details");
+//		
+//		// creating new object from nested in order to pull specific values out
+//		Object detailsType = (Object) details.get("type");
+//				
+//		// getting into nested details object
+//		if (details.get("type") != null) {
+//			System.out.println("Details Type: " + detailsType);
+//		}
+//	}
+//	
+//} catch (ParseException pex) {
+//	System.out.println(pex.getMessage());
+//}
+//
+// 
+//
+//
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+//import org.json.simple.*;
+//import org.json.simple.JSONObject;
+//
+//
+////importing json.simple allows request handler and handleRequest function to use JSONObject as type.
+//
+//
+//public class LambdaFunctionHandler implements RequestHandler<JSONObject, String>  {
+//
+//	@Override
+//    public String handleRequest(JSONObject input, Context context) {
+//    	 context.getLogger().log("\nInput: " + input + "\n");
+//    	 
+//    	 
+//    	
+//    	 //converting input object to a JSON object
+//    	 
+//    	 JSONObject jsonObject = (JSONObject) input;
+//        System.out.println("AS JSON Object: " + jsonObject);
+//    
+//        //doesn't change the output view. Looks the same as the object. When returned it looks like string.
+//        String objAsString = jsonObject.toString();
+//        System.out.println("As a string: " + objAsString);
+//        
+//       //gets the inner object and makes it a string. The output looks like an object.
+////        String details = jsonObject.get("details").toString();
+//        String details = ((String) jsonObject.get("details").get("type"));
+//        System.out.println("Details Object (as String): " + details);
+//       
+//        //trying to get an object returned
+//        //has to be object in order return
+//        Object detailsObj = jsonObject.get("details" );
+//    	System.out.println("Details Object: " + detailsObj);
+//        
+////        //getting data from inside nested object
+////       System.out.println("Action: " + action + "\n");
+//    	 
+//    	 return details;
+//
+//    }
+//	
+//	
+//}

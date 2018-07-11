@@ -1,0 +1,14 @@
+{
+ 	"fans": {
+   		"SS": ["Billy Bob","James"]
+ 		},
+ 	"name": {
+   		"S": "Airplane"
+ 		},
+ 	"rating": {
+   		"S": "*****"
+ 		},
+ 	"year": {
+   		"N": "1980"
+ 		}
+}
